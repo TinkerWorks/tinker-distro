@@ -39,6 +39,23 @@ pipeline {
                 """
             }
         }
-
+        stage('Build raspberrypi0') {
+            steps{
+                sh """ source poky/oe-init-build-env build
+                       export MACHINE=raspberrypi0
+                       export DISTRO=poky-tinker
+                       bitbake homesensorhub-image homesensorhub-bundle
+                """
+            }
+        }
+        stage('Build raspberrypi0') {
+            steps{
+                sh """ source poky/oe-init-build-env build
+                       export MACHINE=raspberrypi0-wifi
+                       export DISTRO=poky-tinker
+                       bitbake homesensorhub-image homesensorhub-bundle
+                """
+            }
+        }
     }
 }
