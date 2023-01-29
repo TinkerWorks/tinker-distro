@@ -48,7 +48,7 @@ pipeline {
                 """
             }
         }
-        stage('Build raspberrypi0') {
+        stage('Build raspberrypi0-wifi') {
             steps{
                 sh """ source poky/oe-init-build-env build
                        export MACHINE=raspberrypi0-wifi
