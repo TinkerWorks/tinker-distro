@@ -1,0 +1,34 @@
+[submodule "poky"]
+	path = poky
+	url = git://git.yoctoproject.org/poky
+	branch = mickledore
+[submodule "meta-openembedded"]
+	path = meta-openembedded
+	url = git://git.openembedded.org/meta-openembedded
+	branch = mickledore
+
+[submodule "meta-raspberrypi"]
+	path = meta-raspberrypi
+	url = https://github.com/agherzan/meta-raspberrypi.git
+	branch = mickledore
+[submodule "meta-rauc"]
+	path = meta-rauc
+	url = https://github.com/rauc/meta-rauc.git
+	branch = mickledore
+[submodule "meta-rauc-community"]
+	path = meta-rauc-community
+	url = https://github.com/rauc/meta-rauc-community.git
+	branch = master
+
+[submodule "meta-tinker"]
+	path = meta-tinker
+	url = https://github.com/TinkerWorks/meta-tinker.git
+	branch = master
+[submodule "meta-browser"]
+	path = meta-browser
+	url = https://github.com/OSSystems/meta-browser.git
+	branch = master
+[submodule "meta-clang"]
+	path = meta-clang
+	url = https://github.com/kraj/meta-clang.git
+	branch = master
