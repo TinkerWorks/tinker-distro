@@ -20,6 +20,9 @@ pipeline {
                      env
                      cat /etc/os-release
                      whoami
+                     pwd
+                     ls
+
                 """
             }
         }
