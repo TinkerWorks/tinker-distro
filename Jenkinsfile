@@ -42,6 +42,13 @@ pipeline {
                 """
             }
         }
+        stage('Create example keys') {
+            steps{
+                sh """ source poky/oe-init-build-env build
+                       ../meta-rauc-community/create-example-keys.sh || true
+                """
+            }
+        }
         stage('Build HomeSensorHub') {
             steps{
                 sh """ source poky/oe-init-build-env build
