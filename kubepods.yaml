@@ -9,6 +9,13 @@ spec:
   - name: crops
     image: crops/yocto:ubuntu-22.04-base # crops/yocto
     imagePullPolicy: "Always"
+    resources:
+      limits:
+        cpu: "12"
+        memory: "6000Mi"
+      requests:
+        cpu: 10000m
+        memory: "4000Mi"
     command:
     - sleep
     args:
