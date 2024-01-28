@@ -52,25 +52,16 @@ pipeline {
         stage('Build HomeSensorHub') {
             steps{
                 sh """ source poky/oe-init-build-env build
-                       export MACHINE=raspberrypi0-wifi
+                       export MACHINE=raspberrypi-armv7
                        export DISTRO=poky-tinker
                        bitbake homesensorhub-image homesensorhub-bundle
                 """
             }
         }
-        stage('Build ControlCenter raspberrypi4-64') {
+        stage('Build ControlCenter') {
             steps{
                 sh """ source poky/oe-init-build-env build
-                       export MACHINE=raspberrypi4-64
-                       export DISTRO=poky-tinker-gui
-                       bitbake controlcenter-image controlcenter-bundle
-                """
-            }
-        }
-        stage('Build ControlCenter raspberrypi3-64') {
-            steps{
-                sh """ source poky/oe-init-build-env build
-                       export MACHINE=raspberrypi3-64
+                       export MACHINE=raspberrypi-armv8
                        export DISTRO=poky-tinker-gui
                        bitbake controlcenter-image controlcenter-bundle
                 """
