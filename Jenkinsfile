@@ -52,7 +52,7 @@ pipeline {
         stage('Build HomeSensorHub') {
             steps{
                 sh """ source poky/oe-init-build-env build
-                       export MACHINE=raspberrypi-armv7
+                       export MACHINE=raspberrypi0-wifi
                        export DISTRO=poky-tinker
                        bitbake homesensorhub-image homesensorhub-bundle
                 """
