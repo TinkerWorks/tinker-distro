@@ -16,9 +16,9 @@ if [ -z "$1" ] ; then
     INTERACTIVE="-it"
     COMMAND=""
 else
-    echo "Running: $1"
+    echo "Running: $@"
     INTERACTIVE="-it"
-    COMMAND="$1"
+    COMMAND="$@"
 fi
 
 
