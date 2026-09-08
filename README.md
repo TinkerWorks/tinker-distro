@@ -44,6 +44,7 @@ bitbake-layers add-layer ../meta-openembedded/meta-oe
 bitbake-layers add-layer ../meta-openembedded/meta-python
 bitbake-layers add-layer ../meta-openembedded/meta-networking
 bitbake-layers add-layer ../meta-openembedded/meta-webserver
+bitbake-layers add-layer ../meta-openembedded/meta-multimedia
 bitbake-layers add-layer ../meta-rauc
 bitbake-layers add-layer ../meta-rauc-community/meta-rauc-raspberrypi
 bitbake-layers add-layer ../meta-tinker
