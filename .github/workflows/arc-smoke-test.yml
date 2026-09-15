@@ -1,0 +1,17 @@
+name: ARC smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arc-smoke-test]
+
+jobs:
+  hello:
+    runs-on: tinkerworks
+    steps:
+      - name: Say hello
+        run: |
+          echo "hello from the homelab"
+          echo "runner=$RUNNER_NAME"
+          echo "arch=$(uname -m)"
+          echo "os=$HOME"
