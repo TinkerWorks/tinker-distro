@@ -8,6 +8,10 @@ on:
 jobs:
   hello:
     runs-on: tinkerworks
+    # the scale set runs in container mode (kubernetes); every job must
+    # declare a container
+    container:
+      image: ubuntu:24.04
     steps:
       - name: Say hello
         run: |
