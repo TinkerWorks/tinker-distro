@@ -59,21 +59,23 @@ jobs:
       - name: Build HomeSensorHub
         run: |
           source ci/memguard.sh
+          source ci/bitbake-heal.sh
           source poky/oe-init-build-env build
           export MACHINE=raspberrypi0-wifi
           export DISTRO=poky-tinker
           memguard_start
-          bitbake homesensorhub-image homesensorhub-bundle || memguard_die "HomeSensorHub"
+          bitbake_heal HomeSensorHub homesensorhub-image homesensorhub-bundle
           memguard_stop
 
       - name: Build ControlCenter
         run: |
           source ci/memguard.sh
+          source ci/bitbake-heal.sh
           source poky/oe-init-build-env build
           export MACHINE=raspberrypi-armv8
           export DISTRO=poky-tinker-gui
           memguard_start
-          bitbake controlcenter-image controlcenter-bundle || memguard_die "ControlCenter"
+          bitbake_heal ControlCenter controlcenter-image controlcenter-bundle
           memguard_stop
 
       - name: Collect artifacts
