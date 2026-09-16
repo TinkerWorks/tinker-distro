@@ -15,6 +15,11 @@ jobs:
   build:
     runs-on: tinkerworks
     timeout-minutes: 1100
+    # the job container sees all 32 host cores; an uncapped 32-way make
+    # (chromium in particular) would OOM the 62Gi host
+    env:
+      BB_NUMBER_THREADS: "16"
+      PARALLEL_MAKE: "-j16"
     # same image the Jenkins pipeline ran in; pulls from Docker Hub
     container:
       image: crops/yocto:ubuntu-22.04-base
