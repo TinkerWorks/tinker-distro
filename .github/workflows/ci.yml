@@ -38,6 +38,8 @@ jobs:
           source poky/oe-init-build-env build
           bitbake-layers add-layer ../meta-raspberrypi
           bitbake-layers add-layer ../meta-openembedded/meta-oe
+          # libcamerasrc (needed by camera-rtsp via meta-tinker's bbappend)
+          bitbake-layers add-layer ../meta-openembedded/meta-multimedia
           bitbake-layers add-layer ../meta-openembedded/meta-python
           bitbake-layers add-layer ../meta-openembedded/meta-networking
           bitbake-layers add-layer ../meta-openembedded/meta-webserver
