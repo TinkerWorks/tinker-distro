@@ -1,0 +1,73 @@
+name: distro
+
+on:
+  # daily 06:00 UTC, as the Jenkins pipeline
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+
+# never run two builds at once
+concurrency:
+  group: distro-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: tinkerworks
+    timeout-minutes: 1100
+    # same image the Jenkins pipeline ran in; pulls from Docker Hub
+    container:
+      image: crops/yocto:ubuntu-22.04-base
+    steps:
+      - name: Check
+        run: |
+          cat /etc/os-release
+          whoami
+          nproc
+          df -h .
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup layers
+        run: |
+          source poky/oe-init-build-env build
+          bitbake-layers add-layer ../meta-raspberrypi
+          bitbake-layers add-layer ../meta-openembedded/meta-oe
+          bitbake-layers add-layer ../meta-openembedded/meta-python
+          bitbake-layers add-layer ../meta-openembedded/meta-networking
+          bitbake-layers add-layer ../meta-openembedded/meta-webserver
+          bitbake-layers add-layer ../meta-rauc
+          bitbake-layers add-layer ../meta-rauc-community/meta-rauc-raspberrypi
+          bitbake-layers add-layer ../meta-tinker
+          bitbake-layers add-layer ../meta-clang
+          bitbake-layers add-layer ../meta-browser/meta-chromium
+
+      - name: Build HomeSensorHub
+        run: |
+          source poky/oe-init-build-env build
+          export MACHINE=raspberrypi0-wifi
+          export DISTRO=poky-tinker
+          bitbake homesensorhub-image homesensorhub-bundle
+
+      - name: Build ControlCenter
+        run: |
+          source poky/oe-init-build-env build
+          export MACHINE=raspberrypi-armv8
+          export DISTRO=poky-tinker-gui
+          bitbake controlcenter-image controlcenter-bundle
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist
+          cp build/tmp/deploy/images/*/*.raucb dist/
+          cp build/tmp/deploy/images/*/*.root.ext4 dist/
+          cp build/tmp/deploy/images/*/*.boot.vfat dist/
+          ls -lh dist/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distro-images
+          path: dist/
+          if-no-files-found: error
