@@ -29,6 +29,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          # keep untracked files (build/: sstate-cache, downloads) between runs;
+          # only possible because the runner workspace is a persistent hostPath
+          clean: false
 
       - name: Setup layers
         run: |
