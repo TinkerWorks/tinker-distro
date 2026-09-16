@@ -1,0 +1,21 @@
+name: ARC smoke test
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [arc-smoke-test]
+
+jobs:
+  hello:
+    runs-on: tinkerworks
+    # the scale set runs in container mode (kubernetes); every job must
+    # declare a container
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Say hello
+        run: |
+          echo "hello from the homelab"
+          echo "runner=$RUNNER_NAME"
+          echo "arch=$(uname -m)"
+          echo "os=$HOME"
