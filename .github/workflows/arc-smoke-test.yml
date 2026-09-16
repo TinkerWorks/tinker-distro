@@ -12,6 +12,8 @@ jobs:
     # declare a container
     container:
       image: ubuntu:24.04
+      # canary: verify the k8s hook maps container.user to the job pod
+      user: "1337"
     steps:
       - name: Say hello
         run: |
@@ -19,3 +21,4 @@ jobs:
           echo "runner=$RUNNER_NAME"
           echo "arch=$(uname -m)"
           echo "os=$HOME"
+          id
