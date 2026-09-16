@@ -18,8 +18,8 @@ jobs:
     # the job container sees all 32 host cores; an uncapped 32-way make
     # (chromium in particular) would OOM the 62Gi host
     env:
-      BB_NUMBER_THREADS: "16"
-      PARALLEL_MAKE: "-j16"
+      BB_NUMBER_THREADS: "8"
+      PARALLEL_MAKE: "-j12"
     # same image the Jenkins pipeline ran in; pulls from Docker Hub
     container:
       image: crops/yocto:ubuntu-22.04-base
@@ -63,6 +63,7 @@ jobs:
           source poky/oe-init-build-env build
           export MACHINE=raspberrypi0-wifi
           export DISTRO=poky-tinker
+          bitbake_preclean HomeSensorHub
           memguard_start
           bitbake_heal HomeSensorHub homesensorhub-image homesensorhub-bundle
           memguard_stop
@@ -74,6 +75,7 @@ jobs:
           source poky/oe-init-build-env build
           export MACHINE=raspberrypi-armv8
           export DISTRO=poky-tinker-gui
+          bitbake_preclean ControlCenter
           memguard_start
           bitbake_heal ControlCenter controlcenter-image controlcenter-bundle
           memguard_stop

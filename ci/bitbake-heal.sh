@@ -12,6 +12,36 @@
 
 MAX_HEALS=3
 
+# bitbake_preclean — one-shot pre-build heal.
+#
+# A killed bitbake run (cgroup OOM, job timeout, pod eviction) leaves the
+# recipes it was running in a half-built state. Rather than discovering
+# them one wave at a time during the build, scan the most recent cooker
+# log: every task that "Started" but never "Succeeded" belongs to a recipe
+# whose workdir must be cleaned before the build can trust it. (A
+# filesystem scan is NOT reliable here: healthy recipes carry run.do_*
+# files for tasks that are never stamped, e.g. do_qa_*.)
+bitbake_preclean() {
+  local label="$1"
+  local cook
+  cook=$(ls -t tmp/log/cooker/*/*.log 2>/dev/null \
+    | grep -v console-latest | head -1)
+  [ -n "$cook" ] || return 0
+  # "NOTE: recipe <fullname>: task <task>: Started|Succeeded"
+  local victims
+  victims=$(awk '
+    $4 == "task" && $6 == "Started"   { sub(/:$/, "", $3); started[$3] = 1 }
+    $4 == "task" && $6 == "Succeeded" { sub(/:$/, "", $3); ok[$3] = 1 }
+    END { for (f in started) if (!(f in ok)) print f }
+  ' "$cook" | sed -E 's/-[0-9].*$//' | sort -u)
+  if [ -z "$victims" ]; then
+    echo "::notice::[${label}] preclean: previous run finished cleanly, nothing to clean"
+    return 0
+  fi
+  echo "::warning::[${label}] preclean: previous run left these recipes unfinished, cleaning: $(echo $victims)"
+  bitbake -c cleansstate $victims || true
+}
+
 bitbake_heal() {
   local label="$1"
   shift
