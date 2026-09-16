@@ -19,8 +19,11 @@ bitbake_heal() {
     return 0
   fi
 
+  # the failed run is always the most recent bitbake invocation; its cooker
+  # log is the newest <machine>/*.log (not the console-latest symlink)
   local cook
-  cook=$(ls -t "${TOPDIR}/log/cooker-"*.log 2>/dev/null | head -1)
+  cook=$(ls -t "${TMPDIR}/log/cooker/"*/*.log 2>/dev/null \
+    | grep -v console-latest | head -1)
   # "ERROR: Task (/path/recipe_1.2.bb:do_compile) failed" -> recipe_1.2
   local bpns
   bpns=$(grep -hoE 'Task \([^)]+\.bb:[a-z_]+' "$cook" 2>/dev/null \
