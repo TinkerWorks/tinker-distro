@@ -20,10 +20,16 @@ bitbake_heal() {
   fi
 
   # the failed run is always the most recent bitbake invocation; its cooker
-  # log is the newest <machine>/*.log (not the console-latest symlink)
+  # log is the newest <machine>/*.log (not the console-latest symlink).
+  # oe-setup-builddir left the shell cwd in the build dir, so the path is
+  # relative (TOPDIR/TMPDIR are bitbake vars, not exported shell vars).
   local cook
-  cook=$(ls -t "${TMPDIR}/log/cooker/"*/*.log 2>/dev/null \
+  cook=$(ls -t tmp/log/cooker/*/*.log 2>/dev/null \
     | grep -v console-latest | head -1)
+  if [ -z "$cook" ]; then
+    echo "::warning::[${label}] no cooker log found under $(pwd)/tmp/log/cooker; listing:"
+    ls -R tmp/log 2>/dev/null | head -30
+  fi
   # "ERROR: Task (/path/recipe_1.2.bb:do_compile) failed" -> recipe_1.2
   local bpns
   bpns=$(grep -hoE 'Task \([^)]+\.bb:[a-z_]+' "$cook" 2>/dev/null \
