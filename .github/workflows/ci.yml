@@ -27,7 +27,11 @@ jobs:
       image: nixos/nix:2.34.8
     steps:
       - name: Check
+        # nix needs HOME (the runner's exec sets none); /__w/home doubles
+        # as the home of every later step (ci/nix-fhs.sh exports the same)
         run: |
+          export HOME=/__w/home
+          mkdir -p "$HOME"
           id -u
           nproc
           df -h .
