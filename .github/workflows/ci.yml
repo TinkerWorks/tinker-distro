@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Check
         run: |
-          whoami
+          id -u
           nproc
           df -h .
           nix --version
