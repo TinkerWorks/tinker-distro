@@ -20,16 +20,18 @@ jobs:
     env:
       BB_NUMBER_THREADS: "8"
       PARALLEL_MAKE: "-j12"
-    # same image the Jenkins pipeline ran in; pulls from Docker Hub
+    # bare nix carrier: everything bitbake needs comes from the flake's FHS
+    # (nix run .#yocto-fhs, see ci/nix-fhs.sh). The image only has to run
+    # nix and provide a shell for the runner's execs.
     container:
-      image: crops/yocto:ubuntu-22.04-base
+      image: nixos/nix:2.34.8
     steps:
       - name: Check
         run: |
-          cat /etc/os-release
           whoami
           nproc
           df -h .
+          nix --version
 
       - uses: actions/checkout@v4
         with:
@@ -40,45 +42,54 @@ jobs:
 
       - name: Setup layers
         run: |
-          source poky/oe-init-build-env build
-          # bitbake-layers validates the parse on every addition, so each
-          # layer's dependencies must be enabled before it
-          bitbake-layers add-layer ../meta-openembedded/meta-oe
-          bitbake-layers add-layer ../meta-openembedded/meta-python
-          bitbake-layers add-layer ../meta-openembedded/meta-webserver
-          bitbake-layers add-layer ../meta-openembedded/meta-networking
-          # libcamerasrc (needed by camera-rtsp via meta-tinker's bbappend)
-          bitbake-layers add-layer ../meta-openembedded/meta-multimedia
-          bitbake-layers add-layer ../meta-raspberrypi
-          bitbake-layers add-layer ../meta-rauc
-          bitbake-layers add-layer ../meta-rauc-community/meta-rauc-raspberrypi
-          bitbake-layers add-layer ../meta-tinker
-          bitbake-layers add-layer ../meta-clang
-          bitbake-layers add-layer ../meta-browser/meta-chromium
+          source ci/nix-fhs.sh
+          fhs_run '
+            source poky/oe-init-build-env build
+            # bitbake-layers validates the parse on every addition, so each
+            # layer's dependencies must be enabled before it
+            bitbake-layers add-layer ../meta-openembedded/meta-oe
+            bitbake-layers add-layer ../meta-openembedded/meta-python
+            bitbake-layers add-layer ../meta-openembedded/meta-webserver
+            bitbake-layers add-layer ../meta-openembedded/meta-networking
+            # libcamerasrc (needed by camera-rtsp via meta-tinker's bbappend)
+            bitbake-layers add-layer ../meta-openembedded/meta-multimedia
+            bitbake-layers add-layer ../meta-raspberrypi
+            bitbake-layers add-layer ../meta-rauc
+            bitbake-layers add-layer ../meta-rauc-community/meta-rauc-raspberrypi
+            bitbake-layers add-layer ../meta-tinker
+            bitbake-layers add-layer ../meta-clang
+            bitbake-layers add-layer ../meta-browser/meta-chromium
+          '
 
       - name: Build HomeSensorHub
         run: |
-          source ci/memguard.sh
-          source ci/bitbake-heal.sh
-          source poky/oe-init-build-env build
-          export MACHINE=raspberrypi0-wifi
-          export DISTRO=poky-tinker
-          bitbake_preclean HomeSensorHub
-          memguard_start
-          bitbake_heal HomeSensorHub homesensorhub-image homesensorhub-bundle
-          memguard_stop
+          source ci/nix-fhs.sh
+          fhs_run '
+            source ci/memguard.sh
+            source ci/bitbake-heal.sh
+            source poky/oe-init-build-env build
+            export MACHINE=raspberrypi0-wifi
+            export DISTRO=poky-tinker
+            bitbake_preclean HomeSensorHub
+            memguard_start
+            bitbake_heal HomeSensorHub homesensorhub-image homesensorhub-bundle
+            memguard_stop
+          '
 
       - name: Build ControlCenter
         run: |
-          source ci/memguard.sh
-          source ci/bitbake-heal.sh
-          source poky/oe-init-build-env build
-          export MACHINE=raspberrypi-armv8
-          export DISTRO=poky-tinker-gui
-          bitbake_preclean ControlCenter
-          memguard_start
-          bitbake_heal ControlCenter controlcenter-image controlcenter-bundle
-          memguard_stop
+          source ci/nix-fhs.sh
+          fhs_run '
+            source ci/memguard.sh
+            source ci/bitbake-heal.sh
+            source poky/oe-init-build-env build
+            export MACHINE=raspberrypi-armv8
+            export DISTRO=poky-tinker-gui
+            bitbake_preclean ControlCenter
+            memguard_start
+            bitbake_heal ControlCenter controlcenter-image controlcenter-bundle
+            memguard_stop
+          '
 
       - name: Collect artifacts
         run: |
