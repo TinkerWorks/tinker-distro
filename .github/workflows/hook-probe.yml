@@ -1,0 +1,15 @@
+# throwaway: keeps a runner + job pod alive so the k8s hook and the merged
+# job pod spec can be inspected (kubectl cp / kubectl get -o yaml)
+name: hook-probe
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    runs-on: tinkerworks
+    container:
+      image: nixos/nix:2.34.8
+    steps:
+      - name: sleep
+        run: sleep 600
